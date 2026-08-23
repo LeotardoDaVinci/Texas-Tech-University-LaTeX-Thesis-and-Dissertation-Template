@@ -2,12 +2,13 @@
     check-compliance.ps1 -- accessibility and formatting checks on the built
     thesis.  Windows.  Run build-Windows.bat first.
 
-    You do not run this directly: double-click check-compliance-Windows.bat in
-    the folder above, which calls this script.
+    You do not run this directly: double-click check-compliance-Windows.bat
+    beside this file, which calls this script.
 
-    Writes docs\compliance-report.txt (all checks) and, when veraPDF is
-    installed, compliance-report.html in the template root (veraPDF's own
-    report, openable in a browser).  Both are overwritten each run.
+    Writes compliance-report.txt (all checks) and, when veraPDF is
+    installed, compliance-report.html, both in the template root.  The HTML
+    one is veraPDF's own report, openable in a browser.  Both are
+    overwritten each run.
     macOS / Linux: use check-compliance-Mac-Linux.sh instead.  Do not edit.
 #>
 [CmdletBinding()]
@@ -15,7 +16,6 @@ param([ValidateSet('ua2','ua1')][string]$Flavour = 'ua2')
 
 $root    = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $build   = Join-Path $root 'build'
-$docs    = Join-Path $root 'docs'
 $jobname = 'thesis-build'
 $pdf     = Join-Path $build "$jobname.pdf"
 $log     = Join-Path $build "$jobname.log"
@@ -37,8 +37,6 @@ if (-not (Test-Path $pdf)) {
     Write-Host "No $pdf -- run build-Windows.bat first."
     exit 1
 }
-if (-not (Test-Path $docs)) { New-Item -ItemType Directory -Path $docs | Out-Null }
-
 $lines += "Texas Tech University thesis template -- compliance report"
 $lines += "Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 $lines += "Checked:   $pdf"
@@ -69,8 +67,26 @@ if (-not $vera) {
                "veraPDF is not installed, so conformance was NOT checked."
 } else {
     $xml = Join-Path $build 'verapdf-report.xml'
-    & $vera --flavour $Flavour --format xml $pdf > $xml 2>&1
-    & $vera --flavour $Flavour --format html $pdf > $htmlReport 2>&1
+    # No 2>&1 here: PowerShell 5.1 wraps a native command's stderr lines in
+    # NativeCommandError records when redirected into a file, and veraPDF's
+    # own parser warnings (plus a stack banner naming this machine's paths)
+    # would otherwise land inside the report, above its <!DOCTYPE>. veraPDF's
+    # stderr chatter is discarded here; its actual result comes from the xml
+    # and html report files it writes on stdout.
+    & $vera --flavour $Flavour --format xml $pdf 2>$null > $xml
+    & $vera --flavour $Flavour --format html $pdf 2>$null > $htmlReport
+    # Defensive: strip anything that ended up before the HTML report's real
+    # start, in case some future veraPDF build writes to stdout too. Also
+    # normalizes the file to plain UTF-8: PowerShell's redirection writes
+    # veraPDF's stdout as UTF-16LE, which is valid HTML but round-trips
+    # oddly through plain-text tooling, so re-save it as UTF-8 either way.
+    # ReadAllText auto-detects the source encoding from its byte-order mark.
+    if (Test-Path $htmlReport) {
+        $htmlText = [System.IO.File]::ReadAllText($htmlReport)
+        $docIndex = $htmlText.IndexOf('<!DOCTYPE')
+        if ($docIndex -gt 0) { $htmlText = $htmlText.Substring($docIndex) }
+        [System.IO.File]::WriteAllText($htmlReport, $htmlText, [System.Text.UTF8Encoding]::new($false))
+    }
     $detail = (Select-String -Path $xml -Pattern '<details passedRules[^>]*>' |
                ForEach-Object { $_.Matches[0].Value }) -join ' '
     if (Select-String -Path $xml -Pattern 'isCompliant="true"' -Quiet) {
@@ -255,8 +271,13 @@ if ($bad) {
 $lines += ""
 $lines += if ($fail) { "RESULT: problems found -- see the FAIL lines above." }
           else       { "RESULT: all checks passed." }
-$txtReport = Join-Path $docs 'compliance-report.txt'
-$lines | Set-Content -Path $txtReport -Encoding UTF8
+$txtReport = Join-Path $root 'compliance-report.txt'
+# Explicit UTF-8 write (not Set-Content -Encoding UTF8, which can double
+# -encode already-UTF-8 text on PowerShell 5.1) so the report round-trips
+# cleanly, and its content is exactly $lines -- nothing from an external
+# tool's stderr can appear in it.
+$txtText = ($lines -join "`r`n") + "`r`n"
+[System.IO.File]::WriteAllText($txtReport, $txtText, [System.Text.UTF8Encoding]::new($false))
 
 Write-Host ""
 if ($fail) { Write-Host "COMPLIANCE CHECK: problems found (see above)." }

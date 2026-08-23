@@ -12,11 +12,11 @@ Template by Joseph L. Micus, Texas Tech University, PhD Class of 2026.
 plus the `tex-gyre` and `tex-gyre-math` font packages, which MiKTeX offers to
 install the first time they are needed.
 
-**To run `check-compliance-Windows.bat` as well:** **Python 3** on your PATH
-(it reads the PDF's tag tree) and **veraPDF**, a free download from
+**To run `util\check-compliance-Windows.bat` as well:** **Python 3** on your
+PATH (it reads the PDF's tag tree) and **veraPDF**, a free download from
 <https://verapdf.org/software/> (it checks PDF/UA-2 conformance). Neither is
 needed to produce the PDF, only to check it before you submit.
-`check-compliance-Windows.bat` tells you plainly if either is missing.
+`util\check-compliance-Windows.bat` tells you plainly if either is missing.
 
 ---
 
@@ -44,8 +44,22 @@ needed to produce the PDF, only to check it before you submit.
 9. Double-click **`build-Windows.bat`** (macOS/Linux: run
    `./build-Mac-Linux.sh`). Your PDF appears beside the script, named by
    `output-name`.
-10. Run **`check-compliance-Windows.bat`** (macOS/Linux:
-    `./check-compliance-Mac-Linux.sh`) before you submit.
+10. Run **`util\check-compliance-Windows.bat`** (macOS/Linux:
+    `./util/check-compliance-Mac-Linux.sh`) before you submit.
+
+## The files you edit — and the ones you don't
+
+Everything you write lives in six places: `main.tex` (the list of chapters),
+`config/` (your details and choices), and the `chapters/`, `frontmatter/`,
+`figures/` and `bibliography/` folders. Those are yours, change them freely.
+
+Everything else is formatting machinery: `ttuthesis2026.cls`, the build
+scripts, and all of `util/`. Those files encode the Graduate School's rules
+and the PDF tagging setup, and editing them risks damage that does not show
+up until the accessibility check fails, formatting is wrong, or the document cannot compile.
+ If something seems to require touching one of them, and it almost never does, the answer is 
+in this README or in `chapters/chapter-style-example.tex`. Edit at your own risk, 
+unless you are really good with LaTeX, in which case make it better and put in a request. 
 
 ## Masters thesis or dissertation?
 
@@ -59,12 +73,14 @@ structure = {sections},   % 1. INTRODUCTION, 2. METHOD, ...
 ```
 
 In `sections` mode there are no chapter banner pages. `\section` becomes your
-top-level command, still starting a new page and still listed in the table of
-contents, and every level below it moves up one step:
+top-level command, styled like a chapters-mode `\section` rather than a
+chapter title, still listed in the table of contents, and every level below it
+moves up one step. Only the first `\section` of the body starts a new page;
+later ones run on like any other heading:
 
 | chapters mode | sections mode | prints as |
 | --- | --- | --- |
-| `\chapter` | `\section` | `1. INTRODUCTION`, new page |
+| `\chapter` | `\section` | `1. INTRODUCTION` |
 | `\section` | `\subsection` | `1.1` |
 | `\subsection` | `\subsubsection` | `1.1.1` |
 | `\subsubsection` | `\paragraph` | unnumbered |
@@ -98,12 +114,12 @@ use `\section` instead, so a half-converted file cannot slip through.
 
 | Platform | Build | Check before submitting |
 | --- | --- | --- |
-| Windows | `build-Windows.bat` — double-click it, or run it from PowerShell | `check-compliance-Windows.bat` |
-| macOS / Linux | `./build-Mac-Linux.sh` | `./check-compliance-Mac-Linux.sh` |
+| Windows | `build-Windows.bat` — double-click it, or run it from PowerShell | `util\check-compliance-Windows.bat` |
+| macOS / Linux | `./build-Mac-Linux.sh` | `./util/check-compliance-Mac-Linux.sh` |
 
-The two `.bat` files are one-line shims: each just runs the matching
-PowerShell script in `util/`, so double-clicking works without opening a
-terminal. Everything in `util/` is machinery you never need to open.
+Each `.bat` file is a one-line shim around the matching PowerShell script in
+`util/`, so double-clicking works without opening a terminal. Nothing in
+`util/` is ever edited, only run.
 
 **The `.sh` scripts are honestly untested.** This template was developed on a
 Windows-only machine; `build-Mac-Linux.sh` and
@@ -126,10 +142,28 @@ extra tools, so it is not something to run on every compile.
 
 It prints a summary and also saves a report, overwritten each run:
 
-- **`docs/compliance-report.txt`** — every check with a `[PASS]` / `[FAIL]`
-  line, a short explanation, and a timestamp.
-- **`compliance-report.html`** — veraPDF's own detailed report, beside the
-  scripts. Open it in a browser. Written only if veraPDF is installed.
+- **`compliance-report.txt`** — every check with a `[PASS]` / `[FAIL]`
+  line, a short explanation, and a timestamp. In the template root.
+- **`compliance-report.html`** — veraPDF's own detailed report, also in the
+  template root. Open it in a browser. Written only if veraPDF is installed.
+
+### Generating the report by hand
+
+The check script writes the report each time it runs, and it only reads the
+PDF that the build script leaves in `build\`. So if you compile some other
+way (clicking Typeset in TeXworks, running `lualatex` yourself, using an
+editor plugin), you can still get the report: just let the build script
+produce the copy the check knows how to find.
+
+```powershell
+.\build-Windows.bat                     # writes build\thesis-build.pdf
+.\util\check-compliance-Windows.bat     # checks it, writes both reports
+```
+
+(macOS/Linux: `./build-Mac-Linux.sh` then `./util/check-compliance-Mac-Linux.sh`.)
+Both reports land in the template root, overwritten each run. Neither is part
+of your document; they exist so you can read them and fix what they flag
+before you submit.
 
 ## Which file do I edit for what?
 
@@ -150,7 +184,8 @@ It prints a summary and also saves a report, overwritten each run:
 
 ### Never edit these
 
-`ttuthesis2026.cls`, the four scripts in the root, and everything in `util/`.
+`ttuthesis2026.cls`, the two build scripts in the root, and everything in
+`util/`.
 
 They encode the Graduate School's requirements and the PDF tagging setup.
 Editing them is how a document stops being compliant. The class in
@@ -158,7 +193,7 @@ particular contains several fixes that look removable and are not.
 
 ---
 
-## The twelve questions
+## FAQ
 
 ### 1. What do I edit first?
 
@@ -273,10 +308,12 @@ and EndNote will export a whole library as a `.bib` file you can drop in place
 of this one.
 
 Set `journal-abbreviations = {true}` in the config to print `Combust. Flame`
-instead of the full title. DOIs are never printed.
+instead of the full title. DOIs, URLs, access dates, ISSN/ISBN and eprint IDs
+are all suppressed by default; see the guide at the top of
+`bibliography/references.bib` for what prints and how to turn a field back on.
 
 Citations and the bibliography are IEEE numeric, set by the `bibstyle` and
-`citestyle` options on line 720 of `ttuthesis2026.cls`. The manual does not
+`citestyle` options on line 724 of `ttuthesis2026.cls`. The manual does not
 pick a citation style — it defers to your department's approved style guide
 (p.5) — so if yours wants APA or Chicago, changing those two biblatex options
 is the change to make. It is not automated here; searching for
@@ -328,19 +365,19 @@ that. The delivered PDF in the root is deliberately **not** deleted by a
 clean, and a failed build leaves the last good copy untouched, so you always
 have something to hand to someone.
 
-`check-compliance-Windows.bat` and `check-compliance-Mac-Linux.sh` check the
-copy inside `build\`. They run straight after a build, so the two files are
-the same document.
+`util\check-compliance-Windows.bat` and `util/check-compliance-Mac-Linux.sh`
+check the copy inside `build\`. Run them straight after a build, so the two
+files are the same document.
 
 ### 11. What must I never edit?
 
-`ttuthesis2026.cls`, the four scripts in the root, and everything in `util/`. See above.
+`ttuthesis2026.cls`, the two build scripts in the root, and everything in `util/`. See above.
 
 ### 12. How do I check accessibility before submitting?
 
 ```powershell
 .\build-Windows.bat
-.\check-compliance-Windows.bat
+.\util\check-compliance-Windows.bat
 ```
 
 It prints one line per check (veraPDF conformance, text extraction, structure
@@ -413,7 +450,7 @@ citations and where each is handled, is in `docs/requirements-matrix.md`.
 | `requirements-matrix.md` | All 77 manual requirements, with where each is implemented and how each was checked. |
 | `architecture-decisions.md` | Design notes: why the template is built this way; packages used and refused; known limitations. |
 | `accessibility-guide.md` | Tagged PDF explained; alt text, tables, math, colour, links; how to run and read the compliance check. |
-| `compliance-report.txt` | Written by the compliance-check scripts, overwritten each run. Not in version control. The HTML half of the report goes to `compliance-report.html` in the template root, where it is easy to find. |
+| (compliance report) | Not kept in `docs/` — the check scripts write it to `compliance-report.txt` in the template root every run, alongside `compliance-report.html`. Not in version control. |
 | (tag-tree dump) | Not kept in `docs/` — the check scripts regenerate it at `build\structure-dump.txt` every run, so it can never go stale. |
 
 ## What is in `util/`

@@ -395,6 +395,16 @@
 %%    else about the document changes: the front matter, the running header,
 %%    the page-number transitions and the three lists are identical.
 %%
+%%    VISUAL STYLE.  There is no chapter-style banner here: \section prints
+%%    exactly like a chapters-mode \section (bold, flush left, run on the same
+%%    page as what precedes it), \subsection like a chapters-mode \subsection,
+%%    and so on down to \subparagraph.  Sections do not force a page break --
+%%    \ThesisMainMatter's own \clearpage puts the very first one on the fresh
+%%    arabic-page-1 that opens the body, and \ttu@appendixcommon /
+%%    \ThesisBibliography carry their own \clearpage for the later major
+%%    divisions -- but a plain \section in the middle of the body runs on
+%%    from the text above it.
+%%
 %%    WHY THIS NUMBERING.  The manual (p.22) leaves decimal numbering optional
 %%    but requires that a document which uses it use it everywhere, floats and
 %%    equations included.  So the top level is "1", "2", subheadings are "1.1"
@@ -420,34 +430,26 @@
 \newcommand{\ttu@secnumber}{\thesection.}
 
 \newcommand{\ttu@sectionheadings}{%
-  \DeclareInstance{headformat}{ttu@toplevel}{hang}
-    {
-      heading-indent   = 0pt ,
-      number-title-sep = 0.5em ,
-      title-format     = {\MakeUppercase{##1}} ,
-    }%
   \DeclareInstance{heading}{section}{display}
     {
-      name                 = section ,
-      level                = 0 ,
-      placement            = top ,
-      before-vspace        = \ttu@chaptop ,
-      after-penalty-vspace = 0pt ,
-      after-vspace         = 8pt ,
-      number-format        = \ttu@secnumber ,
-      heading-decls        = {\normalfont\singlespacing\ttu@chapterfont
-                              \bfseries\centering} ,
-      headformat-instance  = ttu@toplevel ,
-      mark-cmd             = \sectionmark{##1} ,
+      name                = section ,
+      level               = 0 ,
+      before-vspace       = 12pt ,
+      after-vspace        = 6pt ,
+      number-format       = \ttu@secnumber ,
+      heading-decls       = {\normalfont\singlespacing\ttu@sectionfont
+                             \bfseries\raggedright} ,
+      headformat-instance = ttu@section ,
+      mark-cmd            = \sectionmark{##1} ,
     }%
   \DeclareInstance{heading}{subsection}{display}
     {
       name                = subsection ,
       level               = 1 ,
-      before-vspace       = 12pt ,
-      after-vspace        = 6pt ,
-      heading-decls       = {\normalfont\singlespacing\ttu@sectionfont
-                             \bfseries\raggedright} ,
+      before-vspace       = 10pt ,
+      after-vspace        = 5pt ,
+      heading-decls       = {\normalfont\normalsize\bfseries\raggedright
+                             \singlespacing} ,
       headformat-instance = ttu@section ,
       mark-cmd            = \subsectionmark{##1} ,
     }%
@@ -456,9 +458,9 @@
       name                = subsubsection ,
       parent-name         = subsection ,
       level               = 2 ,
-      before-vspace       = 10pt ,
-      after-vspace        = 5pt ,
-      heading-decls       = {\normalfont\normalsize\bfseries\raggedright
+      before-vspace       = 8pt ,
+      after-vspace        = 4pt ,
+      heading-decls       = {\normalfont\normalsize\itshape\raggedright
                              \singlespacing} ,
       headformat-instance = ttu@section ,
     }%
@@ -467,10 +469,9 @@
       name                = paragraph ,
       parent-name         = subsubsection ,
       level               = 3 ,
-      before-vspace       = 8pt ,
-      after-vspace        = 4pt ,
-      heading-decls       = {\normalfont\normalsize\itshape\raggedright
-                             \singlespacing} ,
+      before-vspace       = 6pt ,
+      after-vspace        = 3pt ,
+      heading-decls       = {\normalfont\normalsize\raggedright\singlespacing} ,
       headformat-instance = ttu@section ,
     }%
   \DeclareInstance{heading}{subparagraph}{runin}
@@ -506,12 +507,30 @@
   \renewcommand*\l@section[2]{%
     \ttu@tocgap{0}{6\p@}{6\p@}%
     \begingroup\renewcommand{\ttu@tocfont}{\bfseries}%
+      %% Level 0's format hook is \ttu@uctoc, which uppercases -- correct for
+      %% a \chapter* entry (Abstract, Bibliography, ...) but wrong here: the
+      %% manual requires the ToC to echo the document's own wording, and a
+      %% sections-mode \section is no longer printed in caps (see 6b above).
+      %% The depth test still needs literal level 0, so the entry survives
+      %% \ThesisAppendices setting tocdepth to 0 -- only the FORMAT is
+      %% overridden, and only inside this group, so \l@chapter's entries
+      %% (still uppercase, manual p.18) are untouched.
+      \expandafter\let\csname contentsline@text@0@format\endcsname\@firstofone
       \ttu@dottedtocline{0}{0em}{2.4em}{##1}{##2}%
     \endgroup}%
+  %% subsection is bold and subsubsection is italic in the body (see
+  %% \ttu@sectionheadings above); their ToC lines match it, using the same
+  %% grouped, local \ttu@tocfont idiom as \l@section just above.
   \renewcommand*\l@subsection[2]{%
-    \ttu@tocgap{1}{6\p@}{6\p@}\ttu@dottedtocline{1}{1.5em}{2.8em}{##1}{##2}}%
+    \ttu@tocgap{1}{6\p@}{6\p@}%
+    \begingroup\renewcommand{\ttu@tocfont}{\bfseries}%
+      \ttu@dottedtocline{1}{1.5em}{2.8em}{##1}{##2}%
+    \endgroup}%
   \renewcommand*\l@subsubsection[2]{%
-    \ttu@tocgap{2}{\z@}{\z@}\ttu@dottedtocline{2}{3.0em}{3.6em}{##1}{##2}}%
+    \ttu@tocgap{2}{\z@}{\z@}%
+    \begingroup\renewcommand{\ttu@tocfont}{\itshape}%
+      \ttu@dottedtocline{2}{3.0em}{3.6em}{##1}{##2}%
+    \endgroup}%
 }
 
 %% \chapter has no meaning in this mode, and a student who copies a chapter
@@ -716,9 +735,21 @@
 %%     Single-spaced within an entry, a blank line between entries, and no
 %%     entry split across a page break.
 %% ---------------------------------------------------------------------------
-%% doi=false: the manual wants plain reference entries, no DOI strings.
-\RequirePackage[backend=biber,bibstyle=ieee,citestyle=ieee-comp,
-                sorting=none,doi=false]{biblatex}
+%% ---------------------------------------------------------------------------
+%% WHICH FIELDS PRINT IN THE REFERENCES.  Each line below is one on/off
+%% switch. Delete a line (or flip its "false" to nothing) to bring that field
+%% back; see bibliography/references.bib for the full guide.
+\RequirePackage[backend=biber,bibstyle=ieee,citestyle=ieee-comp,sorting=none,
+                doi=false,    % -- remove this line to print DOIs
+                isbn=false,   % -- remove this line to print ISBN/ISSN
+                url=false,    % -- remove this line to print "[Online]. Available: <url>"
+                eprint=false, % -- remove this line to print eprint/arXiv IDs
+                ]{biblatex}
+%% Belt-and-suspenders: clears these fields outright so no style change can
+%% resurrect the text the options above already suppress. issn/url/urldate
+%% only -- see references.bib for why "note" is left alone on purpose.
+\AtEveryBibitem{\clearfield{issn}\clearfield{url}\clearfield{urldate}}
+%% ---------------------------------------------------------------------------
 \renewcommand*{\bibfont}{\normalfont\normalsize\setstretch{1.0}}
 \setlength{\bibitemsep}{\baselineskip}
 \AtBeginBibliography{\interlinepenalty=10000\relax}
@@ -798,8 +829,19 @@
   \begingroup\renewcommand{\ttu@tocfont}{\bfseries}%
     \ttu@dottedtocline{0}{0em}{2.4em}{#1}{#2}%
   \endgroup}
-\renewcommand*\l@section[2]   {\ttu@dottedtocline{1}{1.5em}{2.8em}{#1}{#2}}
-\renewcommand*\l@subsection[2]{\ttu@dottedtocline{2}{3.0em}{3.6em}{#1}{#2}}
+%% Section and subsection print bold in the body (see the chapters-mode
+%% heading instances above), so their ToC lines match, the same grouped,
+%% local \ttu@tocfont idiom \l@chapter uses -- subsubsection is italic in
+%% the body too, but at tocdepth 2 it never reaches the printed ToC, so
+%% there is no line here for it to disagree with.
+\renewcommand*\l@section[2]{%
+  \begingroup\renewcommand{\ttu@tocfont}{\bfseries}%
+    \ttu@dottedtocline{1}{1.5em}{2.8em}{#1}{#2}%
+  \endgroup}
+\renewcommand*\l@subsection[2]{%
+  \begingroup\renewcommand{\ttu@tocfont}{\bfseries}%
+    \ttu@dottedtocline{2}{3.0em}{3.6em}{#1}{#2}%
+  \endgroup}
 \renewcommand*\l@figure[2]    {\ttu@dottedtocline{1}{0em}{3.0em}{#1}{#2}}
 \renewcommand*\l@table[2]     {\ttu@dottedtocline{1}{0em}{3.0em}{#1}{#2}}
 
@@ -991,8 +1033,12 @@
 %%   \ThesisSingleAppendix   exactly one appendix   -> "APPENDIX", no letter,
 %%                           floats numbered 1, 2, 3 ...
 %%
-%% In both forms the appendix title is styled like a chapter title and appears
-%% in the ToC, while appendix SUBHEADINGS are not listed (manual p.25).
+%% In both forms the appendix title is styled like the document's top-level
+%% heading (a chapter title in chapters mode, a section title in sections
+%% mode) and appears in the ToC, while appendix SUBHEADINGS are not listed
+%% (manual p.25).  \ttu@appendixcommon's own \clearpage keeps the appendix
+%% opening on a fresh page in sections mode even though the section heading
+%% instance no longer forces one.
 %%
 %% The unlettered form works by emptying \thechapter: the chapter heading
 %% instance then prints its prefix ("APPENDIX") with no numeral after it, and

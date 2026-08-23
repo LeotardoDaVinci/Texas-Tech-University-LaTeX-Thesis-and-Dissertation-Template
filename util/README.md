@@ -1,20 +1,21 @@
 # util/
 
-Build and compliance-check machinery. **Nothing here is needed to write a
-thesis** — you never have to open this folder. The four scripts in the template
-root are the entry points; two of them just call the PowerShell files here.
+Build and compliance-check machinery. **Nothing here is ever edited** — the
+build entry points live in the template root, and the compliance-check entry
+points (`check-compliance-Windows.bat`, `check-compliance-Mac-Linux.sh`) live
+here; you run those two and open nothing else.
 
 | File | What it does |
 | --- | --- |
 | `build.ps1` | The real Windows build: lualatex → biber → lualatex → lualatex, then copies the finished PDF into the template root under the name from `output-name`. Called by `build-Windows.bat`. |
-| `check-compliance.ps1` | The real Windows compliance check: veraPDF conformance, text extraction, character encoding, figure alt text, build-log triage. Writes `docs/compliance-report.txt` and `compliance-report.html` in the root. Called by `check-compliance-Windows.bat`. |
+| `check-compliance.ps1` | The real Windows compliance check: veraPDF conformance, text extraction, character encoding, figure alt text, build-log triage. Writes `compliance-report.txt` and `compliance-report.html`, both in the root. Called by `check-compliance-Windows.bat`. |
 | `output-name.ps1`, `output-name.sh` | Read `output-name` out of `config/thesis-config.tex` and hand back the delivered PDF's file name. Shared by the build and check scripts on each platform so the two can never disagree about what the file is called. |
 | `dump-structure.py` | Walks the PDF's `/StructTreeRoot` and prints an indented outline of the tag tree, a tag-name histogram, and every `/Alt` and `/ActualText` string decoded — including the UTF-16BE hex form (`/Alt <FEFF0041…>`) that LaTeX actually writes. It ends with a machine-readable `ALT SUMMARY:` line the check scripts assert on, and flags any `/Alt` that is merely the graphic's file name. Requires Python 3; no third-party packages. |
 
-The macOS/Linux scripts (`build-Mac-Linux.sh`, `check-compliance-Mac-Linux.sh`)
-carry their logic inline in the root rather than shimming to anything here,
-because on those platforms they *are* the entry point. The one exception is
-`output-name.sh`, which they source.
+The macOS/Linux scripts (`build-Mac-Linux.sh` in the root,
+`check-compliance-Mac-Linux.sh` here) carry their logic inline rather than
+shimming to anything, because on those platforms they *are* the entry point.
+The one exception is `output-name.sh`, which they source.
 
 Three details worth knowing if you ever change the scripts:
 

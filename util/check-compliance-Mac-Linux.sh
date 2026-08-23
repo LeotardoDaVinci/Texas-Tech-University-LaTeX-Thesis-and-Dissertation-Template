@@ -4,12 +4,12 @@
 # extraction, character encoding, figure alt text, and build-log warnings.
 # Run ./build-Mac-Linux.sh first.
 #
-#   ./check-compliance-Mac-Linux.sh                 check against PDF/UA-2
-#   ./check-compliance-Mac-Linux.sh --flavour ua1
+#   ./util/check-compliance-Mac-Linux.sh            check against PDF/UA-2
+#   ./util/check-compliance-Mac-Linux.sh --flavour ua1
 #
-# Writes docs/compliance-report.txt and, if veraPDF is installed,
-# compliance-report.html beside this script.
-# Windows: use check-compliance-Windows.bat instead. Do not edit.
+# Writes compliance-report.txt and, if veraPDF is installed,
+# compliance-report.html, both in the template root (the folder above).
+# Windows: use util\check-compliance-Windows.bat instead. Do not edit.
 #
 # HONEST NOTE: this script was written on a Windows-only machine. It has been
 # syntax-checked (bash -n) and mirrors util/check-compliance.ps1 step for step,
@@ -18,9 +18,8 @@
 
 set -uo pipefail   # deliberately not -e: every check must run, then report
 
-root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 build="$root/build"
-docs="$root/docs"
 jobname="thesis-build"
 pdf="$build/$jobname.pdf"
 log="$build/$jobname.log"
@@ -49,9 +48,8 @@ if [ ! -f "$pdf" ]; then
     echo "No $pdf -- run ./build-Mac-Linux.sh first."
     exit 1
 fi
-mkdir -p "$docs"
 
-txt_report="$docs/compliance-report.txt"
+txt_report="$root/compliance-report.txt"
 html_report="$root/compliance-report.html"
 : > "$txt_report"
 
@@ -95,8 +93,19 @@ if [ -z "$vera" ]; then
                "veraPDF is not installed, so conformance was NOT checked."
 else
     xml="$build/verapdf-report.xml"
-    "$vera" --flavour "$flavour" --format xml  "$pdf" > "$xml"         2>&1 || true
-    "$vera" --flavour "$flavour" --format html "$pdf" > "$html_report" 2>&1 || true
+    # stderr is discarded, not merged into the report: veraPDF's parser
+    # warnings and any stack trace naming this machine's paths must never
+    # land inside the report files.
+    "$vera" --flavour "$flavour" --format xml  "$pdf" > "$xml"         2>/dev/null || true
+    "$vera" --flavour "$flavour" --format html "$pdf" > "$html_report" 2>/dev/null || true
+    # Defensive: strip anything ahead of the HTML report's real start, in
+    # case some future veraPDF build writes to stdout too.
+    if [ -f "$html_report" ]; then
+        doc_line="$(grep -n '<!DOCTYPE' "$html_report" | head -1 | cut -d: -f1 || true)"
+        if [ -n "$doc_line" ] && [ "$doc_line" -gt 1 ]; then
+            tail -n "+$doc_line" "$html_report" > "$html_report.tmp" && mv "$html_report.tmp" "$html_report"
+        fi
+    fi
     detail="$(grep -o '<details passedRules[^>]*>' "$xml" | head -1 || true)"
     if grep -q 'isCompliant="true"' "$xml"; then
         echo "  PASS ($flavour)"

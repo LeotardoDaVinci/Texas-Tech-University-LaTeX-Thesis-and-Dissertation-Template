@@ -11,7 +11,7 @@
 %  capitalisation, page ranges and author initials.
 %
 %  CITATION STYLE.  This template cites and formats the bibliography in IEEE
-%  numeric style, set by the bibstyle and citestyle options on line 720 of
+%  numeric style, set by the bibstyle and citestyle options on line 724 of
 %  ttuthesis2026.cls.  Another style -- APA, Chicago author-year, and so on --
 %  means changing those two biblatex options; it is not automated here, but
 %  biblatex is well documented and a search for "biblatex <style name>" will
@@ -23,6 +23,28 @@
 %  decided by journal-abbreviations in config/thesis-config.tex. DOIs are
 %  recorded here but never rendered, so keep them: they cost nothing and make
 %  the entry easy to verify later.
+%
+%  WHAT PRINTS AND WHAT DOESN'T.  By default the bibliography prints in plain
+%  journal style: author, title, journal/publisher, volume, pages, year.
+%  DOIs, URLs, "[Online]. Available:" text, access dates, ISSN/ISBN, and
+%  eprint/arXiv IDs are all suppressed, even when an entry has that data --
+%  keep recording them anyway; they cost nothing and help a reader verify a
+%  source later.
+%
+%  TURNING A FIELD BACK ON.  The switches live in ttuthesis2026.cls, in the
+%  "WHICH FIELDS PRINT IN THE REFERENCES" block inside section 11
+%  BIBLIOGRAPHY. Each field is one biblatex package option on its own line
+%  (doi=false, isbn=false, url=false, eprint=false); delete the line for the
+%  field you want printed. ISSN, URL and access-date are also cleared
+%  outright by an \AtEveryBibitem line right below the options -- remove the
+%  matching \clearfield{...} there too, or the field will still vanish.
+%
+%  THE ZOTERO NOTE-FIELD GOTCHA.  Some citation managers (Zotero especially)
+%  export a stray "_eprint: <url>" -- or other junk -- into an entry's note
+%  field. note is a real field and is not cleared automatically, so that text
+%  will print. If a reference shows odd trailing text, open the entry here
+%  and delete the junk from its note field (or remove the note field
+%  entirely).
 % ===========================================================================
 
 @article{upper1974,

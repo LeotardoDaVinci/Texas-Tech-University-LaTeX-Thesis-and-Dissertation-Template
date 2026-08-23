@@ -184,7 +184,7 @@ From the template folder:
 
 ```powershell
 .\build-Windows.bat            # build first: the check inspects the built PDF
-.\check-compliance-Windows.bat
+.\util\check-compliance-Windows.bat
 ```
 
 It runs four checks and prints one line each:
@@ -214,7 +214,7 @@ it.
 
 Two ways, in increasing order of effort:
 
-**`build\structure-dump.txt`.** Produced by `check-compliance-Windows.bat`. A plain indented
+**`build\structure-dump.txt`.** Produced by `util\check-compliance-Windows.bat`. A plain indented
 outline of the tag tree, with each figure's `/Alt` text decoded, plus counts of
 `TH`/`TD` cells and ToC entries. Fastest way to confirm a figure got its alt
 text or a table got its header row.

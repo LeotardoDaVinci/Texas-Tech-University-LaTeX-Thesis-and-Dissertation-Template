@@ -11,26 +11,32 @@
 %
 %      chapters mode        sections mode
 %      -------------        -------------
-%      \chapter        ->   \section        "1. INTRODUCTION", new page
+%      \chapter        ->   \section        "1. INTRODUCTION"
 %      \section        ->   \subsection     1.1
 %      \subsection     ->   \subsubsection  1.1.1
 %      \subsubsection  ->   \paragraph      unnumbered
 %      \paragraph      ->   \subparagraph   unnumbered, run-in
+%
+%  Only the very first \section of the body -- the one \ThesisMainMatter puts
+%  on the fresh arabic-page-1 -- is guaranteed a page to itself. Every later
+%  \section runs on from whatever precedes it, the same as a \subsection would
+%  in a chapter.
 %
 %  Everything else -- figures, tables, equations, citations, alt text -- is
 %  written exactly as it is in a chapter. See chapter-style-example.tex for the full
 %  set of "% HOW TO:" notes on each of those.
 % ===========================================================================
 
-% HOW TO: a top-level division starts with \section{...}. It begins a new page
-% and is numbered automatically ("1. INTRODUCTION").
+% HOW TO: a top-level division starts with \section{...} and is numbered
+% automatically ("1. INTRODUCTION"). Only the first one in the body starts a
+% new page; later top-level sections do not.
 \section{Introduction}
 
 This file shows the same document written without chapters. A masters thesis
 is often short enough that a chapter is the wrong unit of division, and the
 Graduate School's rules for a top-level division apply just as well to a
-numbered section: it starts a new page, it is listed in the table of contents,
-and it is the only level that resets the figure, table and equation numbers.
+numbered section: it is listed in the table of contents, and it is the only
+level that resets the figure, table and equation numbers.
 
 Numbering follows the manual's rule that a decimal scheme, once adopted, is
 used everywhere (p.22). Top-level sections are 1, 2, 3; subheadings are 1.1
