@@ -1,5 +1,4 @@
-# Texas Tech University Thesis Template 2026
-
+# Texas Tech University Thesis & Dissertation LaTeX Template
 A LaTeX template for Texas Tech University theses and dissertations. It
 follows the Graduate School's formatting manual (rev. February 2026) and
 produces a properly tagged, PDF/UA-2 compliant PDF, which is required to pass
