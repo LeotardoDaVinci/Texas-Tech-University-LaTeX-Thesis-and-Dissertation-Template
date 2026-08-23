@@ -21,7 +21,7 @@ needed to produce the PDF, only to check it before you submit.
 
 ## Quick start
 
-1. If acquiring from githup, either download as a .zip file and extract
+1. If acquiring from github, either download as a .zip file and extract
    or open a terminal in your desired directory and run the following
    command: 
 
