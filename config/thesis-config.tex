@@ -1,0 +1,48 @@
+%% ===========================================================================
+%%  YOUR INFORMATION -- fill in the blanks.  This is the only settings file.
+%%  Keep the braces { } around every value, and keep the commas.
+%%  (Do not leave a blank line inside \ThesisSetup -- start any note with %.)
+%% ===========================================================================
+\ThesisSetup{
+  %% Name of the finished PDF ------------------------------------------------
+  %% The build writes ____________.pdf into this folder.  Put your own name
+  %% here -- no ".pdf", no slashes.  Leave the braces empty for "thesis.pdf".
+  output-name    = {TTU-Example-Dissertation},
+  %% Document-wide layout choices -------------------------------------------
+  left-margin    = {1in},              % allowed: 1in  or  1.5in
+  line-spacing   = {onehalf},          % allowed: onehalf  or  double
+  degree-type    = {dissertation},     % allowed: thesis  or  dissertation
+  %% How the body is divided.  chapters = CHAPTER I, CHAPTER II, ... (the usual
+  %% dissertation).  sections = no chapters at all: your top-level headings are
+  %% \section, numbered 1, 2, 3, with \subsection 1.1 beneath them -- common for
+  %% a masters thesis.  See "Masters thesis or dissertation?" in README.md.
+  structure      = {chapters},         % allowed: chapters  or  sections
+  %% Title -- 238 characters maximum ----------------------------------------
+  %% This is also the PDF's title, the name a reader sees in their viewer's
+  %% title bar and the one a screen reader announces on opening. Replace it.
+  title          = {Texas Tech University Thesis Template 2026},
+  %% Your name --------------------------------------------------------------
+  %% The title page shows the full name with credentials; the running header
+  %% and the copyright page show "First M. Last" without them.
+  first-name     = {Firstname},
+  middle-initial = {A},                % just the letter, no period; or empty
+  last-name      = {Lastname},
+  credentials    = {B.S., M.S.},       % prior degrees; or leave empty
+  %% Degree and department --------------------------------------------------
+  department     = {Department},  % e.g. Department of Mechanical Engineering
+  degree         = {Doctor of Philosophy}, % Master of Science, etc.
+  %% Committee --------------------------------------------------------------
+  chair          = {Dr. Committee Chair},
+  committee      = {Dr. Second Member, Dr. Third Member},  % comma-separated
+  dean           = {Dr. Graduate School Dean},
+  %% Graduation date --------------------------------------------------------
+  month          = {December},
+  year           = {2026},
+  %% Bibliography -----------------------------------------------------------
+  %% true  = print abbreviated journal names (uses each entry's shortjournal
+  %%         field, falling back to the full name when there is none)
+  %% false = always print the full journal name
+  journal-abbreviations = {false},
+  %% PDF keywords (optional, comma-separated) -------------------------------
+  keywords       = {keyword one, keyword two},
+}

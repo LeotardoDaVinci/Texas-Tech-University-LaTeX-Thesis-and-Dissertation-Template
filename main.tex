@@ -1,0 +1,56 @@
+%% ===========================================================================
+%%  TTU THESIS / DISSERTATION -- MAIN FILE
+%%  You edit three kinds of file: config/thesis-config.tex (your details),
+%%  frontmatter/*.tex, and chapters/*.tex.  Never edit ttuthesis2026.cls.
+%%  Build by double-clicking build-Windows.bat.  The finished PDF appears in
+%%  this folder, named by output-name in config/thesis-config.tex.
+%% ===========================================================================
+
+%% Document metadata for a tagged, accessibility-compliant PDF.  Must stay
+%% at the very top of the file.
+\DocumentMetadata{
+  lang          = en,
+  pdfstandard   = ua-2,
+  tagging       = on,
+  tagging-setup = {math/setup=mathml-SE},
+}
+
+\documentclass{ttuthesis2026}
+
+\input{config/thesis-config}                 % your name, title, committee, ...
+\addbibresource{bibliography/references.bib} % your reference list
+
+\begin{document}
+
+\ThesisFrontMatter                    % title page + copyright page (automatic)
+
+\input{frontmatter/acknowledgments}
+\ThesisTableOfContents
+\input{frontmatter/abstract}
+\ThesisListOfTables
+\ThesisListOfFigures
+\input{frontmatter/abbreviations}
+
+\ThesisMainMatter
+
+%% ==== ADD YOUR CHAPTERS HERE ================================================
+%%  One \input line per chapter, in the order they should appear.
+%%  To add a chapter: copy chapters/chapter-style-example.tex to a new name, then
+%%  duplicate one line below and change the file name.
+%%  Writing a masters thesis with no chapters?  Set structure = {sections} in
+%%  config/thesis-config.tex and point these lines at section-style files --
+%%  chapters/section-style-example.tex is the worked sample.
+\input{chapters/chapter-style-example}
+%% ==== END OF CHAPTERS =======================================================
+
+\ThesisBibliography
+
+%% ==== APPENDICES (delete this block if you have none) =======================
+%%  Two or more appendices -> \ThesisAppendices     (lettered APPENDIX A, B, C)
+%%  Exactly one appendix   -> \ThesisSingleAppendix (unlettered "APPENDIX")
+%%  Either way, one \input line per appendix file.
+\ThesisAppendices
+\input{chapters/chapter-style-appendix}
+%% ============================================================================
+
+\end{document}

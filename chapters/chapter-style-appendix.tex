@@ -1,0 +1,37 @@
+% HOW TO: an appendix is written exactly like a chapter. \ThesisAppendices in
+% main.tex switches the numbering to letters, so this becomes "APPENDIX A".
+% Its subheadings are deliberately left out of the table of contents.
+\chapter{Supplementary Material}
+
+Supporting material that would interrupt the argument belongs here rather than
+in the body: extended derivations, full instrument settings, code listings,
+questionnaire text, or the signed AI Use Agreement if one is required. An
+appendix is read by the few people who need it, so completeness matters more
+than concision.
+
+Each appendix is a separate file with its own \verb|\chapter| command and its
+own \verb|\input| line in \verb|main.tex|, exactly like a chapter. Use
+\verb|\ThesisAppendices| when there are two or more, so they are lettered A,
+B, C; use \verb|\ThesisSingleAppendix| when there is exactly one, which prints
+an unlettered ``APPENDIX'' and numbers its tables and figures plainly.
+
+\section{An Appendix Subheading}
+
+Appendix subheadings are styled like the ones in a chapter but are left out of
+the table of contents, which lists appendix titles only. Tables and figures
+inside an appendix carry the appendix letter and are still listed in the List
+of Tables and the List of Figures, so a reader scanning those lists can find
+them without knowing they are in an appendix.
+
+\begin{table}
+  \caption{Instrument settings used throughout the study.}
+  \label{tab:appendix-settings}
+  \begin{tabular}{lr}
+    \toprule
+    Setting & Value \\
+    \midrule
+    Sampling rate (Hz) & 1000 \\
+    Gain               &   10 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

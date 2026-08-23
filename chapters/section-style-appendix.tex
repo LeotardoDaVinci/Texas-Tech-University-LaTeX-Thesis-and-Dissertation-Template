@@ -1,0 +1,36 @@
+% ===========================================================================
+%  SECTION-STYLE APPENDIX -- for structure = sections only.
+%  The chapters-mode counterpart is chapters/chapter-style-appendix.tex.
+%
+%  An appendix is written like any other top-level division, so in this mode
+%  its title is a \section and its subheadings are \subsection. \ThesisAppendices
+%  in main.tex prints "APPENDIX A" in front of the title and numbers the
+%  appendix figures and tables A.1, A.2; \ThesisSingleAppendix prints a bare
+%  "APPENDIX" and numbers them 1, 2.
+% ===========================================================================
+
+\section{Supplementary Material}
+
+Supporting material that would interrupt the argument belongs here rather than
+in the body: extended derivations, full instrument settings, code listings,
+questionnaire text, or the signed AI Use Agreement if one is required.
+
+\subsection{An Appendix Subheading}
+
+Appendix subheadings are styled like the ones in the body but are left out of
+the table of contents, which lists appendix titles only. Tables and figures
+inside an appendix carry the appendix letter and are still listed in the List
+of Tables and the List of Figures.
+
+\begin{table}
+  \caption{Instrument settings used throughout the study.}
+  \label{tab:sec-appendix-settings}
+  \begin{tabular}{lr}
+    \toprule
+    Setting & Value \\
+    \midrule
+    Sampling rate (Hz) & 1000 \\
+    Gain               &   10 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
