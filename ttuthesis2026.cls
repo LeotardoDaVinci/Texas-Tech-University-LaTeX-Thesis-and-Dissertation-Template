@@ -395,15 +395,20 @@
 %%    else about the document changes: the front matter, the running header,
 %%    the page-number transitions and the three lists are identical.
 %%
-%%    VISUAL STYLE.  There is no chapter-style banner here: \section prints
-%%    exactly like a chapters-mode \section (bold, flush left, run on the same
-%%    page as what precedes it), \subsection like a chapters-mode \subsection,
-%%    and so on down to \subparagraph.  Sections do not force a page break --
-%%    \ThesisMainMatter's own \clearpage puts the very first one on the fresh
-%%    arabic-page-1 that opens the body, and \ttu@appendixcommon /
-%%    \ThesisBibliography carry their own \clearpage for the later major
-%%    divisions -- but a plain \section in the middle of the body runs on
-%%    from the text above it.
+%%    VISUAL STYLE.  In the BODY there is no chapter-style banner: \section
+%%    prints exactly like a chapters-mode \section (bold, flush left, run on
+%%    the same page as what precedes it), \subsection like a chapters-mode
+%%    \subsection, and so on down to \subparagraph.  Body sections do not
+%%    force a page break -- \ThesisMainMatter's own \clearpage puts the very
+%%    first one on the fresh arabic-page-1 that opens the body, and
+%%    \ThesisBibliography carries its own \clearpage -- but a plain \section
+%%    in the middle of the body runs on from the text above it.
+%%
+%%    The APPENDICES are the exception, and deliberately so: an appendix is a
+%%    major division, so each one opens on its own page under a centred,
+%%    uppercase banner, like the Bibliography and the Abstract.  Section 14
+%%    re-declares the section heading instance and wraps \section to do that,
+%%    for the appendix run only.
 %%
 %%    WHY THIS NUMBERING.  The manual (p.22) leaves decimal numbering optional
 %%    but requires that a document which uses it use it everywhere, floats and
@@ -515,7 +520,17 @@
       %% \ThesisAppendices setting tocdepth to 0 -- only the FORMAT is
       %% overridden, and only inside this group, so \l@chapter's entries
       %% (still uppercase, manual p.18) are untouched.
-      \expandafter\let\csname contentsline@text@0@format\endcsname\@firstofone
+      %%
+      %% Appendices are the exception, and \ttu@tocappendixtrue -- written into
+      %% the .toc by \ttu@appendixcommon -- marks where they begin.  From there
+      %% on the entries are appendix titles, which print as uppercase banners
+      %% like every other major division, so the ToC echoes them that way and
+      %% the level-0 format is left alone.  Leaving it alone also restores the
+      %% \ifblank guard in \ttu@uctoc@num, which is what stops a lone,
+      %% unlettered appendix printing as a bare ". SUPPLEMENTARY MATERIAL".
+      \ifttu@tocappendix\else
+        \expandafter\let\csname contentsline@text@0@format\endcsname\@firstofone
+      \fi
       \ttu@dottedtocline{0}{0em}{2.4em}{##1}{##2}%
     \endgroup}%
   %% subsection is bold and subsubsection is italic in the body (see
@@ -1075,6 +1090,10 @@
 \newcommand{\ttu@setappcount}[1]{\gdef\ttu@appcount{#1}}
 \newcommand{\ttu@appnow}{0}            % appendices seen on this run
 \newif\ifttu@inappendix
+%% Set while the .toc is being TYPESET, not while it is being written: it is
+%% switched on by a line \ttu@appendixcommon puts into the .toc file itself,
+%% so that \l@section can tell body entries from appendix entries.
+\newif\ifttu@tocappendix
 
 \newcommand{\ttu@appendixcommon}{%
   \clearpage
@@ -1082,6 +1101,8 @@
   \ttu@inappendixtrue
   \renewcommand{\chaptername}{\appendixname}%
   \addtocontents{toc}{\protect\setcounter{tocdepth}{0}}%
+  \addtocontents{toc}{\protect\ttu@tocappendixtrue}%
+  \ttu@ifsections{\ttu@appendix@sectionbreak}{}%
   \setcounter{figure}{0}\setcounter{table}{0}\setcounter{equation}{0}}
 
 \AtEndDocument{%
@@ -1098,11 +1119,18 @@
   \fi}
 
 %%
-%% With structure = sections there are no chapters to letter, so the same two
-%% forms work on the top-level SECTION instead: its number becomes A, B, C and
-%% the word "APPENDIX" is printed in front of it.  An appendix file written for
-%% one mode therefore needs its headings shifted for the other, which is the
-%% one manual step described in the README.
+%% APPENDIX TITLES ARE DIVISION BANNERS IN BOTH MODES.  The manual asks that
+%% appendix titles be styled like chapter titles (p.25), which is a statement
+%% about RANK: an appendix is a major division, the peer of the Bibliography
+%% and the Abstract, not a heading inside the body.  Those divisions are set
+%% the same way in either structure -- centred, uppercase, at the top of a
+%% fresh page -- so appendices are too.  In chapters mode \chapter already
+%% does that.  In sections mode the top-level heading is \section, which
+%% normally prints flush left and runs on from the text above it, so inside
+%% the appendices its instance is re-declared to the chapter banner and
+%% \ttu@appendix@sectionbreak gives every appendix its own page.  The heading
+%% stays at level 0, so the tagged structure is unchanged: the appendix title
+%% is H1 and its \subsection subheadings are H2, exactly as before.
 \newcommand{\ThesisAppendices}{%
   \ttu@appendixcommon
   \ifnum\ttu@appcount=1\relax
@@ -1116,11 +1144,68 @@
 %% \ThesisAppendices under its former name.
 \newcommand{\ThesisSingleAppendix}{\ThesisAppendices}
 
+%% Guard at the top of the section-style sample files.  \chapter already
+%% refuses to run in sections mode (\ttu@blockchapter in section 6b); this is
+%% the mirror image.  Without it a section-style file dropped into a chapters
+%% document is not an error at all -- \section is perfectly legal there, it
+%% just means SUBHEADING -- so the file silently becomes part of whatever
+%% division preceded it.  As an appendix that is invisible and expensive: the
+%% appendix count stays at one, so the whole run reverts to the unlettered
+%% form and the second appendix arrives as a numbered subheading of the first,
+%% with no banner and no page break.  Better to stop and say which file to use.
+\newcommand{\ThesisSectionsOnly}{%
+  \ttu@ifsections{}{%
+    \ClassError{ttuthesis2026}
+      {This file is written for structure = sections}
+      {Its headings start at \string\section, which in a chapters document is a
+       SUBHEADING rather than a division, so the file would be absorbed into
+       whatever came before it.\MessageBreak
+       Either input the chapter-style file of the same name instead, or set
+       structure = {sections} in config/thesis-config.tex.}}}
+
+%% Sections mode only: re-declare the top-level \section as the chapter-style
+%% banner used by every other major division.  Same keys as the chapter
+%% instance in section 6 above, with level 0 kept so the tagging and the ToC
+%% depth test are untouched, and \thesection (the letter, or nothing at all)
+%% supplying the number after the "APPENDIX" prefix.
+\newcommand{\ttu@appendix@sectionbanner}{%
+  \DeclareInstance{heading}{section}{display}
+    {
+      name                 = section ,
+      level                = 0 ,
+      placement            = top ,
+      before-vspace        = \ttu@chaptop ,
+      after-penalty-vspace = 0pt ,
+      after-vspace         = 8pt ,
+      prefix               = {\MakeUppercase{\appendixname}} ,
+      number-format        = \thesection ,
+      heading-decls        = {\normalfont\singlespacing\ttu@chapterfont
+                              \bfseries\centering} ,
+      headformat-instance  = ttu@chapter ,
+      mark-cmd             = \sectionmark{##1} ,
+    }%
+}
+
+%% ... and give each one its own page.  \chapter carries its own \clearpage in
+%% the other mode; \section does not, so it is wrapped here.  Only the appendix
+%% run is affected: the wrapper is installed by \ttu@appendixcommon, after all
+%% body sections have already been set.
+\newcommand{\ttu@appendix@sectionbreak}{%
+  \NewCommandCopy{\ttu@app@realsection}{\section}%
+  \RenewDocumentCommand{\section}{som}{%
+    \clearpage
+    \IfBooleanTF{##1}
+      {\ttu@app@realsection*{##3}}
+      {\IfNoValueTF{##2}
+        {\ttu@app@realsection{##3}}
+        {\ttu@app@realsection[##2]{##3}}}}%
+}
+
 \newcommand{\ttu@appendix@lettered}{%
   \ttu@ifsections
     {\setcounter{section}{0}%
      \renewcommand{\thesection}{\Alph{section}}%
-     \renewcommand{\ttu@secnumber}{\appendixname\ \Alph{section}}}
+     \ttu@appendix@sectionbanner}
     {\renewcommand{\ttu@chapnum}{\thechapter}}}
 
 %% The unlettered form works by emptying \thechapter (or, in sections mode,
@@ -1131,7 +1216,7 @@
   \ttu@ifsections
     {\setcounter{section}{0}%
      \renewcommand{\thesection}{}%
-     \renewcommand{\ttu@secnumber}{\appendixname}%
+     \ttu@appendix@sectionbanner
      \renewcommand{\thesubsection}{\arabic{subsection}}%
      \renewcommand{\thefigure}{\arabic{figure}}%
      \renewcommand{\thetable}{\arabic{table}}%

@@ -22,29 +22,38 @@ needed to produce the PDF, only to check it before you submit.
 
 ## Quick start
 
-1. Copy this whole folder and give it your own name.
-2. Open `config/thesis-config.tex`. Set `output-name` to what the finished
+1. If acquiring from githup, either download as a .zip file and extract
+   or open a terminal in your desired directory and run the following
+   command: 
+
+   ```git clone https://github.com/LeotardoDaVinci/Texas-Tech-University-LaTeX-Thesis-and-Dissertation-Template.git MyNewFolderName```
+
+   Keep the .git folder to track version history, or delete for simplicity
+   (versions cannot be tracked in this case). 
+
+2. Otherwise, if you acquire the folder by other means, copy this whole folder and give it your own name.
+3. Open `config/thesis-config.tex`. Set `output-name` to what the finished
    PDF should be called, then fill in your name, title, department, degree,
    committee, and graduation date.
-3. In the same file choose your `left-margin` (`1in` or `1.5in`) and
+4. In the same file choose your `left-margin` (`1in` or `1.5in`) and
    `line-spacing` (`onehalf` or `double`). Your name is assembled from
    `first-name`, `middle-initial`, `last-name` and `credentials`: the title
    page shows all four, the running header and copyright page show just
    `First M. Last`. Empty fields disappear cleanly.
-4. Write your acknowledgments and abstract in `frontmatter/`.
-5. List your abbreviations in `frontmatter/abbreviations.tex`, or delete its
+5. Write your acknowledgments and abstract in `frontmatter/`.
+6. List your abbreviations in `frontmatter/abbreviations.tex`, or delete its
    `\input` line from `main.tex` if you have none.
-6. Read `chapters/chapter-style-example.tex` once. Every element you will ever
+7. Read `chapters/chapter-style-example.tex` once. Every element you will ever
    need is in it, each preceded by a `% HOW TO:` comment you can copy.
-7. For each new chapter: copy `chapters/chapter-style-example.tex`, rename it,
+8. For each new chapter: copy `chapters/chapter-style-example.tex`, rename it,
    and add one `\input` line to the **ADD YOUR CHAPTERS HERE** block in
    `main.tex`.
-8. Put your references in `bibliography/references.bib` and cite them with
+9. Put your references in `bibliography/references.bib` and cite them with
    `\cite{key}`.
-9. Double-click **`build-Windows.bat`** (macOS/Linux: run
+10. Double-click **`build-Windows.bat`** (macOS/Linux: run
    `./build-Mac-Linux.sh`). Your PDF appears beside the script, named by
    `output-name`.
-10. Run **`util\check-compliance-Windows.bat`** (macOS/Linux:
+11. Run **`util\check-compliance-Windows.bat`** (macOS/Linux:
     `./util/check-compliance-Mac-Linux.sh`) before you submit.
 
 ## The files you edit — and the ones you don't
@@ -87,14 +96,16 @@ later ones run on like any other heading:
 | `\paragraph` | `\subparagraph` | unnumbered, run-in |
 
 Figures, tables and equations restart in each top-level section and take its
-number — Figure 1.1, Table 2.3 — which is the same decimal scheme the chapter
+number (Figure 1.1, Table 2.3), which is the same decimal scheme the chapter
 mode uses, as the manual requires once you number anything decimally (p.22).
 Appendices still work through `\ThesisAppendices`, which letters them from how
-many there are; their titles are `\section` in this mode. The
-front and back matter — title page, table of contents, abstract, the two
-lists, bibliography — are untouched and stay top-level headings, and the
-running header, margins, page numbering and tagging are identical in both
-modes.
+many there are. Their titles are `\section` in this mode, but they do not print
+like body sections: an appendix is a major division, so each one opens on a
+fresh page under a centred, uppercase banner, the same treatment the
+Bibliography and the Abstract get in either mode. The front and back matter,
+title page, table of contents, abstract, the two lists, bibliography, are
+untouched and stay top-level headings, and the running header, margins, page
+numbering and tagging are identical in both modes.
 
 **The one manual step:** the switch does not rewrite your content, so point
 `main.tex` at section-style files. Two samples ship for exactly this:
@@ -106,9 +117,15 @@ modes.
 \input{chapters/section-style-appendix}    % instead of chapters/chapter-style-appendix
 ```
 
-Copy those two the way you would copy `chapter-style-example.tex`. If you leave
-a `\chapter` command in a `sections` document the build stops and tells you to
-use `\section` instead, so a half-converted file cannot slip through.
+Copy those two the way you would copy `chapter-style-example.tex`. The guard
+runs both ways, so a half-converted document cannot slip through: leave a
+`\chapter` in a `sections` document and the build stops and tells you to use
+`\section`; input a `section-style-*` file into a `chapters` document and it
+stops and tells you to use the chapter-style file of the same name. That second
+case is the one worth knowing about, because `\section` is perfectly legal in a
+chapters document — it just means *subheading*. Without the guard a
+section-style appendix would be silently swallowed by the appendix before it:
+no banner, no page break, and the appendix count stuck at one.
 
 ## Which script do I run?
 

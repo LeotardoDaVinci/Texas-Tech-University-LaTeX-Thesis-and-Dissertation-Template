@@ -25,7 +25,11 @@
 %  Everything else -- figures, tables, equations, citations, alt text -- is
 %  written exactly as it is in a chapter. See chapter-style-example.tex for the full
 %  set of "% HOW TO:" notes on each of those.
+%
+%  The line below stops the build if this file is used in a chapters document,
+%  where every heading in it would land one level too deep instead of erroring.
 % ===========================================================================
+\ThesisSectionsOnly
 
 % HOW TO: a top-level division starts with \section{...} and is numbered
 % automatically ("1. INTRODUCTION"). Only the first one in the body starts a

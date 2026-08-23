@@ -139,7 +139,7 @@ claim is testable rather than asserted: an over-stretched line raises an
 log. `\ThesisRaggedRight` is provided as a one-line escape hatch if a reviewer
 objects anyway.
 
-## D14. Appendices letter themselves, and why floats stay "A.1"
+## D14. Appendices letter themselves, open as banners, and why floats stay "A.1"
 
 The manual letters two or more appendices A, B, C but leaves a lone appendix
 unlettered (p.25). That used to be the author's choice between two commands,
@@ -168,6 +168,35 @@ the same shift when an author adds or removes an appendix.
 
 `\ThesisSingleAppendix` survives as an alias for `\ThesisAppendices` so that
 documents written against the old two-command interface keep compiling.
+
+**Appendix titles are division banners in both modes.** The manual asks that
+appendix titles be styled like chapter titles (p.25), which is a statement about
+rank: an appendix is a major division, the peer of the Bibliography and the
+Abstract, not a heading inside the body. Those divisions look the same whichever
+structure the document uses — centred, uppercase, at the top of a fresh page —
+so appendices do too. In chapters mode `\chapter` already delivers that. In
+sections mode the top-level heading is `\section`, which normally prints flush
+left and runs on from the text above it, so for the appendix run the section
+heading instance is re-declared to the chapter banner and `\section` is wrapped
+in a `\clearpage`. The instance stays at level 0, so the tagged structure does
+not move: the appendix title is still H1 and its `\subsection` subheadings H2.
+This supersedes the earlier choice to let sections-mode appendices keep the body
+section look, which left several appendices running together on one page with no
+banner between them. The table of contents follows: a flag written into the
+`.toc` at the start of the appendices tells `\l@section` to stop overriding the
+uppercase level-0 format, so appendix entries read like BIBLIOGRAPHY rather than
+like body sections — and that restores the `\ifblank` guard that keeps a lone,
+unlettered appendix from printing as ". SUPPLEMENTARY MATERIAL".
+
+**The section-style files now refuse to run in a chapters document.** This is
+the mirror of the existing block on `\chapter` in a sections document, and it
+closes a trap that cost a real build: `\section` is perfectly legal in a
+chapters document, it just means *subheading*, so a `section-style-appendix.tex`
+inputted there was not an error at all. It was quietly absorbed into the
+appendix before it — no banner, no page break, and, because the appendix count
+is taken from the top-level counter, the count stayed at one and the whole run
+reverted to the unlettered form. Silent and expensive to diagnose. The guard
+turns it into a message naming the file to use instead.
 
 The unlettered form works by emptying `\thechapter` (or `\thesection` in
 sections mode), which also removes the chapter component from `\thesection`
