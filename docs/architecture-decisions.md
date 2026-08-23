@@ -139,19 +139,62 @@ claim is testable rather than asserted: an over-stretched line raises an
 log. `\ThesisRaggedRight` is provided as a one-line escape hatch if a reviewer
 objects anyway.
 
-## D14. Appendices: two commands, and why floats stay "A.1"
+## D14. Appendices letter themselves, and why floats stay "A.1"
 
-`\ThesisAppendices` letters appendices A, B, C; `\ThesisSingleAppendix` prints
-an unlettered "APPENDIX" for the lone-appendix case the manual calls for
-(p.25). The unlettered form works by emptying `\thechapter`, which also
-removes the chapter component from `\thesection` (otherwise a lone appendix
-would number its first section "1.1", the string Chapter I already used) and
-numbers its floats plainly ("Table 1").
+The manual letters two or more appendices A, B, C but leaves a lone appendix
+unlettered (p.25). That used to be the author's choice between two commands,
+which is exactly the kind of decision a template should not ask for: getting it
+wrong is silent, and the shipped example got it wrong itself, printing
+"APPENDIX A" over a single appendix. `\ThesisAppendices` is now the only
+command and works the distinction out for itself.
+
+The count comes for free. `\appendix` zeroes the counter that appendix
+top-level headings step — `chapter` in chapters mode, `section` in sections
+mode — so at `\end{document}` that counter *is* the number of appendices. An
+`\AtEndDocument` hook writes it into the `.aux` as `\ttu@setappcount{n}`, and
+the next run reads it back before the appendices begin: the same round trip the
+table of contents and cross-references already depend on. A first pass over a
+fresh document has no count yet and letters the appendices, which is the safe
+default — un-lettering several appendices would print the same bare "APPENDIX"
+over each of them — and the pass after that settles. Because the count does
+not depend on the form chosen, the round trip cannot oscillate, and the class
+warns when the count changes so a hand-run single pass is not silently stale.
+
+Un-lettering changes the table of contents entry, which shifts every structure
+number after it, and the shifted numbers need one more pass to be read back
+consistently or `tagpdf` reports destinations with no related structure. The
+build scripts therefore run four passes rather than three, which also absorbs
+the same shift when an author adds or removes an appendix.
+
+`\ThesisSingleAppendix` survives as an alias for `\ThesisAppendices` so that
+documents written against the old two-command interface keep compiling.
+
+The unlettered form works by emptying `\thechapter` (or `\thesection` in
+sections mode), which also removes the chapter component from `\thesection`
+(otherwise a lone appendix would number its first section "1.1", the string
+Chapter I already used) and numbers its floats plainly ("Table 1").
 
 Appendix floats in the lettered form are numbered **A.1, not A1**. The manual
 is silent on the format and defers to the style guide (p.5); Turabian uses the
 decimal form, and p.22 requires that whatever numbering scheme is used be
 applied consistently, which the document's existing 1.1 scheme settles.
+
+A lone appendix numbers its floats **1, not A.1**. The manual mandates the
+unlettered title and requires appendix tables and figures to be numbered and
+listed (p.25) but says nothing about the form of the numbers, so p.5 hands the
+question to Turabian. Turabian heads a lone appendix simply "Appendix", with no
+letter (9th ed., p.410), and reserves double numeration for material inside a
+numbered division; matter outside one is numbered straight through. An
+unlettered appendix has no division number for a decimal to hang off, so
+"Table A.1" would print a letter the manual has just struck from the title. No
+Turabian passage addressing the lone-appendix float case directly was found, so
+this is a consistency-and-clarity reading rather than a quoted rule. It does
+not offend p.22: the lone appendix drops decimal numbering from headings,
+floats and equations together rather than mixing two schemes, and nothing
+collides, since body floats are "Table 1.1" and never "Table 1". The cost is
+that the List of Tables reads 1.1, 1.2, 1 — the appendix entry looks out of
+sequence until you notice it is the last one — which is the price of not
+inventing a letter the manual removed.
 
 ## D15. Tables are flush left
 

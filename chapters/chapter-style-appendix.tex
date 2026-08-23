@@ -1,5 +1,7 @@
 % HOW TO: an appendix is written exactly like a chapter. \ThesisAppendices in
-% main.tex switches the numbering to letters, so this becomes "APPENDIX A".
+% main.tex counts the appendix files listed there and numbers them to match:
+% on its own this prints an unlettered "APPENDIX", and next to a second
+% appendix file it prints "APPENDIX A".
 % Its subheadings are deliberately left out of the table of contents.
 \chapter{Supplementary Material}
 
@@ -10,18 +12,19 @@ appendix is read by the few people who need it, so completeness matters more
 than concision.
 
 Each appendix is a separate file with its own \verb|\chapter| command and its
-own \verb|\input| line in \verb|main.tex|, exactly like a chapter. Use
-\verb|\ThesisAppendices| when there are two or more, so they are lettered A,
-B, C; use \verb|\ThesisSingleAppendix| when there is exactly one, which prints
-an unlettered ``APPENDIX'' and numbers its tables and figures plainly.
+own \verb|\input| line in \verb|main.tex|, exactly like a chapter. The
+\verb|\ThesisAppendices| line above those inputs is all the setup there is:
+two or more appendix files are lettered A, B, C, with their tables and figures
+numbered A.1, B.1 and so on, while a single appendix file prints an unlettered
+``APPENDIX'' and numbers its tables and figures 1, 2, 3.
 
 \section{An Appendix Subheading}
 
 Appendix subheadings are styled like the ones in a chapter but are left out of
 the table of contents, which lists appendix titles only. Tables and figures
-inside an appendix carry the appendix letter and are still listed in the List
-of Tables and the List of Figures, so a reader scanning those lists can find
-them without knowing they are in an appendix.
+inside an appendix carry the appendix letter, where there is one, and are
+listed in the List of Tables and the List of Figures either way, so a reader
+scanning those lists can find them without knowing they are in an appendix.
 
 \begin{table}
   \caption{Instrument settings used throughout the study.}

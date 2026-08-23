@@ -1026,12 +1026,16 @@
   \printbibliography[heading=none]%
   \clearpage}
 
-%% Appendices.  Two forms, because the manual (p.25) distinguishes them:
+%% Appendices.  \ThesisAppendices is the only command a student writes, and it
+%% letters itself: the manual (p.25) wants two or more appendices lettered
+%% A, B, C and styled like chapter titles, but a lone appendix left unlettered,
+%% so the class counts the appendices the document actually contains and picks
+%% the right form.
 %%
-%%   \ThesisAppendices       two or more appendices -> lettered A, B, C,
-%%                           floats numbered A.1, B.1, ...
-%%   \ThesisSingleAppendix   exactly one appendix   -> "APPENDIX", no letter,
-%%                           floats numbered 1, 2, 3 ...
+%%   two or more appendices -> "APPENDIX A", "APPENDIX B", headings A.1, B.1,
+%%                             floats "Table A.1", "Figure B.2", equations A.1
+%%   exactly one appendix   -> "APPENDIX" with no letter, headings 1, 2,
+%%                             floats "Table 1", "Figure 1", equations (1)
 %%
 %% In both forms the appendix title is styled like the document's top-level
 %% heading (a chapter title in chapters mode, a section title in sections
@@ -1040,19 +1044,58 @@
 %% opening on a fresh page in sections mode even though the section heading
 %% instance no longer forces one.
 %%
-%% The unlettered form works by emptying \thechapter: the chapter heading
-%% instance then prints its prefix ("APPENDIX") with no numeral after it, and
-%% \ThesisFrontSection-style ToC entries drop the numeral too (see the
-%% \ifblank guard in \ttu@uctoc@num above).  With no letter to hang a float
-%% number off, the decimal scheme has nothing to be decimal about, so floats
-%% revert to plain arabic -- "Table 1", "Figure 1" -- which is what the
-%% manual's own single-appendix example shows.
+%% WHY PLAIN NUMBERS IN A LONE APPENDIX.  The manual mandates the unlettered
+%% title (p.25) and requires appendix tables and figures to be numbered and
+%% listed (p.25), but says nothing about the FORM of those numbers, so the
+%% approved style guide governs (p.5).  Turabian's own rule is that a lone
+%% appendix is headed simply "Appendix" with no letter (9th ed., p.410) and
+%% that double numeration belongs to material sitting inside a numbered
+%% division; matter outside one is numbered straight through.  An unlettered
+%% appendix has no division number for a decimal to hang off, so "Table A.1"
+%% would print a letter the manual has just struck from the title.  The p.22
+%% consistency rule is satisfied either way -- it asks that a document using
+%% decimal numbering use it for headings, floats and equations alike, and the
+%% lone appendix drops all three together rather than mixing the two schemes.
+%% Nothing collides: the body's floats are "Table 1.1", never "Table 1".
+%%
+%% HOW THE COUNT IS TAKEN.  \appendix zeroes the counter that the appendix
+%% top-level headings step (chapter in chapters mode, section in sections
+%% mode), so at \end{document} that counter simply IS the number of
+%% appendices.  It is written into the .aux and read back at the start of the
+%% next run, the same round trip the ToC and cross-references already use.  A
+%% first pass over a fresh document therefore letters the appendices -- the
+%% safe default, since un-lettering several appendices would print the same
+%% bare "APPENDIX" over each of them -- and the following pass settles on the
+%% right form.  A hand-run single pass may need the usual re-run, and the class
+%% says so in a warning.  The count does not depend on the form chosen, so the
+%% round trip cannot oscillate.  Un-lettering shifts the ToC entry and with it
+%% every structure number after it, which needs one further pass to be read
+%% back cleanly; that is why the build scripts run four passes, not three.
+\newcommand{\ttu@appcount}{0}          % appendices seen on the previous run
+\newcommand{\ttu@setappcount}[1]{\gdef\ttu@appcount{#1}}
+\newcommand{\ttu@appnow}{0}            % appendices seen on this run
+\newif\ifttu@inappendix
+
 \newcommand{\ttu@appendixcommon}{%
   \clearpage
   \appendix
+  \ttu@inappendixtrue
   \renewcommand{\chaptername}{\appendixname}%
   \addtocontents{toc}{\protect\setcounter{tocdepth}{0}}%
   \setcounter{figure}{0}\setcounter{table}{0}\setcounter{equation}{0}}
+
+\AtEndDocument{%
+  \ifttu@inappendix
+    \ttu@ifsections
+      {\xdef\ttu@appnow{\the\value{section}}}
+      {\xdef\ttu@appnow{\the\value{chapter}}}%
+    \immediate\write\@auxout{\string\ttu@setappcount{\ttu@appnow}}%
+    \ifnum\ttu@appnow=\ttu@appcount\relax\else
+      \ClassWarningNoLine{ttuthesis2026}
+        {The number of appendices changed; run the build again so the
+         appendix lettering settles}%
+    \fi
+  \fi}
 
 %%
 %% With structure = sections there are no chapters to letter, so the same two
@@ -1062,14 +1105,29 @@
 %% one manual step described in the README.
 \newcommand{\ThesisAppendices}{%
   \ttu@appendixcommon
+  \ifnum\ttu@appcount=1\relax
+    \ttu@appendix@single
+  \else
+    \ttu@appendix@lettered
+  \fi}
+
+%% Kept so that documents written against the older two-command interface keep
+%% compiling.  Detection makes the distinction by itself, so this is simply
+%% \ThesisAppendices under its former name.
+\newcommand{\ThesisSingleAppendix}{\ThesisAppendices}
+
+\newcommand{\ttu@appendix@lettered}{%
   \ttu@ifsections
     {\setcounter{section}{0}%
      \renewcommand{\thesection}{\Alph{section}}%
      \renewcommand{\ttu@secnumber}{\appendixname\ \Alph{section}}}
     {\renewcommand{\ttu@chapnum}{\thechapter}}}
 
-\newcommand{\ThesisSingleAppendix}{%
-  \ttu@appendixcommon
+%% The unlettered form works by emptying \thechapter (or, in sections mode,
+%% \thesection): the top-level heading instance then prints its prefix
+%% ("APPENDIX") with no numeral after it, and the ToC entry drops the numeral
+%% too (see the \ifblank guard in \ttu@uctoc@num above).
+\newcommand{\ttu@appendix@single}{%
   \ttu@ifsections
     {\setcounter{section}{0}%
      \renewcommand{\thesection}{}%

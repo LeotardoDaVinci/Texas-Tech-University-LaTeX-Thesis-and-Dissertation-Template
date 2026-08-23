@@ -89,8 +89,8 @@ later ones run on like any other heading:
 Figures, tables and equations restart in each top-level section and take its
 number — Figure 1.1, Table 2.3 — which is the same decimal scheme the chapter
 mode uses, as the manual requires once you number anything decimally (p.22).
-Appendices still work through `\ThesisAppendices` and `\ThesisSingleAppendix`
-and still read "APPENDIX A"; their titles are `\section` in this mode. The
+Appendices still work through `\ThesisAppendices`, which letters them from how
+many there are; their titles are `\section` in this mode. The
 front and back matter — title page, table of contents, abstract, the two
 lists, bibliography — are untouched and stay top-level headings, and the
 running header, margins, page numbering and tagging are identical in both
@@ -426,10 +426,10 @@ citations and where each is handled, is in `docs/requirements-matrix.md`.
 - **Oversized tables and figures.** Landscape pages are not available in this
   template. Split the table across pages with `longtable`, scale the figure
   with `width=`, or move it to an appendix (p.23).
-- **A single appendix** is unlettered per the manual (p.25). Use
-  `\ThesisSingleAppendix` instead of `\ThesisAppendices` in `main.tex` when you
-  have exactly one; it prints a bare "APPENDIX" and numbers its tables and
-  figures plainly (Table 1) rather than A.1.
+- **A single appendix** is unlettered per the manual (p.25), and
+  `\ThesisAppendices` handles that for you: it counts the appendices in the
+  document, so one appendix prints a bare "APPENDIX" and numbers its tables and
+  figures plainly (Table 1) rather than A.1, while two or more are lettered.
 - **Preface.** Rare but permitted (p.20). Add one with
   `\ThesisFrontSection{Preface}` before `\ThesisTableOfContents` in `main.tex`.
 - **Glossary.** Treated as an appendix (p.26). The `abbreviationlist`

@@ -88,6 +88,12 @@ fi
 
 run_pass 2
 run_pass 3
+# A fourth pass, because pass 2 is the first one that knows how many appendices
+# the document has and so is the first that can un-letter a lone one. That
+# changes the table of contents entry, which shifts every structure number
+# after it; pass 3 lays the shifted numbers down and pass 4 is the one that
+# reads them back consistently. Cheaper than asking anyone to notice.
+run_pass 4
 
 # Put the finished PDF where you can find it: in the template root, not buried
 # in build/. This copy is the one you submit or send to your committee. It is
