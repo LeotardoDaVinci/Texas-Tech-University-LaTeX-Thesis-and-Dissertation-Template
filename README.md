@@ -1,61 +1,141 @@
 # Texas Tech University Thesis & Dissertation LaTeX Template
+
 A LaTeX template for Texas Tech University theses and dissertations. It
 follows the Graduate School's formatting manual (rev. February 2026) and
 produces a properly tagged, PDF/UA-2 compliant PDF, which is required to pass
 the Graduate School's accessibility check starting Spring 2026.
 
-Template by Joseph L. Micus, Texas Tech University, PhD Class of 2026.
+**Author and maintainer:** Joseph L. Micus, Texas Tech University, PhD Class of 2026
 
-**To write and build:** **MiKTeX**, a free download from
-<https://miktex.org/download> (it brings **LuaLaTeX** and **biber** with it),
-plus the `tex-gyre` and `tex-gyre-math` font packages, which MiKTeX offers to
-install the first time they are needed.
+> [!WARNING]
+> **This is an unofficial template and has not been formally approved by the
+> Graduate School.** Users are responsible for verifying that their final
+> document complies with current Graduate School requirements. This may change
+> soon; I am using this template for my own dissertation submission and will
+> update it as needed based on the Graduate School's review.
 
-**To run `util\check-compliance-Windows.bat` as well:** **Python 3** on your
-PATH (it reads the PDF's tag tree) and **veraPDF**, a free download from
-<https://verapdf.org/software/> (it checks PDF/UA-2 conformance). Neither is
-needed to produce the PDF, only to check it before you submit.
-`util\check-compliance-Windows.bat` tells you plainly if either is missing.
+---
+
+## Requirements
+
+### To write and build
+
+Install **MiKTeX**, available free from <https://miktex.org/download>. MiKTeX
+includes **LuaLaTeX** and **biber** and will offer to install the `tex-gyre` and
+`tex-gyre-math` font packages the first time they are needed.
+
+### To run the compliance checker
+
+The template can be built without these, but running
+`util/check-compliance-Windows.bat` also requires:
+
+- **Python 3** available on your PATH, used to inspect the PDF tag tree.
+- **veraPDF**, available free from <https://verapdf.org/software/>, used to
+  check PDF/UA-2 conformance.
+
+The compliance checker will tell you if either dependency is missing.
 
 ---
 
 ## Quick start
 
-1. If acquiring from github, either download as a .zip file and extract
-   or open a terminal in your desired directory and run the following
-   command: 
+1. **Get your own copy of the template.**
 
-   ```git clone https://github.com/LeotardoDaVinci/Texas-Tech-University-LaTeX-Thesis-and-Dissertation-Template.git MyNewFolderName```
+   **If you received the template directly** (for example, as a folder, ZIP
+   file, or on a USB drive), copy or extract the entire folder to your computer
+   and rename it for your dissertation. 
 
-   Keep the .git folder to track version history, or delete for simplicity
-   (versions cannot be tracked in this case). 
+   **If you are getting the template from GitHub**, either download the
+   repository as a ZIP file and extract it, or clone it with Git:
 
-2. Otherwise, if you acquire the folder by other means, copy this whole folder and give it your own name.
-3. Open `config/thesis-config.tex`. Set `output-name` to what the finished
-   PDF should be called, then fill in your name, title, department, degree,
+   ```bash
+   git clone https://github.com/LeotardoDaVinci/Texas-Tech-University-LaTeX-Thesis-and-Dissertation-Template.git MyNewFolderName
+   ```
+
+   Downloading the ZIP gives you a standalone copy with no Git history or
+   connection to this repository. Cloning preserves this repository's Git
+   history and its connection to GitHub.
+
+   If you want to use Git only to track the version history of your own
+   dissertation, you may delete the `.git` folder from the cloned copy and
+   initialize a new repository with:
+
+   ```bash
+   git init
+   ```
+
+   This creates a fresh Git repository for your dissertation with no connection
+   to the original template.
+
+   Pulling future changes directly from the template repository after you have
+   begun writing may require merging those changes with your own work. Unless
+   you are comfortable with Git, treat your dissertation as a separate project
+   once you begin modifying the template.
+
+2. **Configure your dissertation.**
+
+   Open `config/thesis-config.tex`. Set `output-name` to what the finished PDF
+   should be called, then enter your name, title, department, degree,
    committee, and graduation date.
-4. In the same file choose your `left-margin` (`1in` or `1.5in`) and
-   `line-spacing` (`onehalf` or `double`). Your name is assembled from
-   `first-name`, `middle-initial`, `last-name` and `credentials`: the title
-   page shows all four, the running header and copyright page show just
-   `First M. Last`. Empty fields disappear cleanly.
-5. Write your acknowledgments and abstract in `frontmatter/`.
-6. List your abbreviations in `frontmatter/abbreviations.tex`, or delete its
-   `\input` line from `main.tex` if you have none.
-7. Read `chapters/chapter-style-example.tex` once. Every element you will ever
-   need is in it, each preceded by a `% HOW TO:` comment you can copy.
-8. For each new chapter: copy `chapters/chapter-style-example.tex`, rename it,
-   and add one `\input` line to the **ADD YOUR CHAPTERS HERE** block in
-   `main.tex`.
-9. Put your references in `bibliography/references.bib` and cite them with
-   `\cite{key}`.
-10. Double-click **`build-Windows.bat`** (macOS/Linux: run
-   `./build-Mac-Linux.sh`). Your PDF appears beside the script, named by
-   `output-name`.
-11. Run **`util\check-compliance-Windows.bat`** (macOS/Linux:
-    `./util/check-compliance-Mac-Linux.sh`) before you submit.
 
-## The files you edit — and the ones you don't
+3. **Choose your document formatting.**
+
+   In the same file, set `left-margin` (`1in` or `1.5in`) and `line-spacing`
+   (`onehalf` or `double`). Your name is assembled from `first-name`,
+   `middle-initial`, `last-name`, and `credentials`. The title page shows all
+   four, while the running header and copyright page use `First M. Last`.
+   Empty fields are omitted automatically.
+
+4. **Complete the front matter.**
+
+   Write your acknowledgments and abstract in `frontmatter/`. Add
+   abbreviations to `frontmatter/abbreviations.tex`, or delete its `\input`
+   line from `main.tex` if you do not need an abbreviations section.
+
+5. **Read the chapter example once.**
+
+   Open `chapters/chapter-style-example.tex`. It contains examples of the
+   elements you will need throughout the dissertation, each preceded by a
+   `% HOW TO:` comment that can be copied as needed.
+
+6. **Add your chapters.**
+
+   For each chapter, copy `chapters/chapter-style-example.tex`, rename the
+   copy, and add one `\input` line to the **ADD YOUR CHAPTERS HERE** block in
+   `main.tex`.
+
+7. **Add your references.**
+
+   Put bibliography entries in `bibliography/references.bib` and cite them
+   with `\cite{key}`. `references.bib` does not need to be a static
+   file, and there are many ways to link it to your citation manager. I use 
+   Zotero with the BetterBibTeX for Zotero plugin. There are likely several
+   different ways to manage this and they are not explored in this template.
+
+8. **Build the dissertation.**
+
+   On Windows, double-click **`build-Windows.bat`**. On macOS/Linux, run:
+
+   ```bash
+   ./build-Mac-Linux.sh
+   ```
+
+   The finished PDF appears beside the build script using the filename set by
+   `output-name`.
+
+9. **Check compliance before submission.**
+
+   On Windows, run **`util/check-compliance-Windows.bat`**. On macOS/Linux,
+   run:
+
+   ```bash
+   ./util/check-compliance-Mac-Linux.sh
+   ```
+
+   Resolve any reported accessibility or PDF/UA-2 issues before submitting
+   the final document.
+
+## The files you edit, and the ones that you don't
 
 Everything you write lives in six places: `main.tex` (the list of chapters),
 `config/` (your details and choices), and the `chapters/`, `frontmatter/`,
@@ -66,8 +146,9 @@ scripts, and all of `util/`. Those files encode the Graduate School's rules
 and the PDF tagging setup, and editing them risks damage that does not show
 up until the accessibility check fails, formatting is wrong, or the document cannot compile.
  If something seems to require touching one of them, and it almost never does, the answer is 
-in this README or in `chapters/chapter-style-example.tex`. Edit at your own risk, 
-unless you are really good with LaTeX, in which case make it better and put in a request. 
+in this README or in `chapters/chapter-style-example.tex`. Edit at your own risk.  
+If you know your way around LaTeX and see something that could be better, have at it. 
+PRs are welcome; if the change materially improves the project, I’ll merge it.
 
 ## Masters thesis or dissertation?
 
@@ -150,7 +231,7 @@ then LuaLaTeX twice more so cross-references and the table of contents settle.
 Run it as often as you like.
 
 **The compliance check** runs the accessibility check the Graduate School
-requires — PDF/UA-2 tagging and figure alt text, verified with veraPDF — and
+requires: PDF/UA-2 tagging and figure alt text, verified with veraPDF, and
 alongside it the formatting health of the document: layout warnings from the
 build log, and whether the text still extracts and round-trips as correct
 characters. Run it before you submit; it is slower than a build and needs two
@@ -330,8 +411,8 @@ are all suppressed by default; see the guide at the top of
 
 Citations and the bibliography are IEEE numeric, set by the `bibstyle` and
 `citestyle` options on line 724 of `ttuthesis2026.cls`. The manual does not
-pick a citation style — it defers to your department's approved style guide
-(p.5) — so if yours wants APA or Chicago, changing those two biblatex options
+pick a citation style. It defers to your department's approved style guide
+(p.5). So if yours wants APA or Chicago, changing those two biblatex options
 is the change to make. It is not automated here; searching for
 `biblatex <style name>` will tell you which option value to use.
 
@@ -466,7 +547,6 @@ citations and where each is handled, is in `docs/requirements-matrix.md`.
 | `requirements-matrix.md` | All 77 manual requirements, with where each is implemented and how each was checked. |
 | `architecture-decisions.md` | Design notes: why the template is built this way; packages used and refused; known limitations. |
 | `accessibility-guide.md` | Tagged PDF explained; alt text, tables, math, colour, links; how to run and read the compliance check. |
-| (compliance report) | Not kept in `docs/` — the check scripts write it to `compliance-report.txt` in the template root every run, alongside `compliance-report.html`. Not in version control. |
 | (tag-tree dump) | Not kept in `docs/` — the check scripts regenerate it at `build\structure-dump.txt` every run, so it can never go stale. |
 
 ## What is in `util/`
