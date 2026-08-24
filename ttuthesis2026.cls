@@ -22,6 +22,7 @@
 %% ---------------------------------------------------------------------------
 \RequirePackage{fontspec}
 \RequirePackage{unicode-math}
+\RequirePackage{microtype}
 \RequirePackage{geometry}
 \RequirePackage{amsmath}
 \RequirePackage{graphicx}
