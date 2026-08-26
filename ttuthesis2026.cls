@@ -194,6 +194,17 @@
       }
   }
 
+\cs_new_protected:Npn \ttu_bibliography_spacing:
+  {
+    \str_if_eq:eeTF { \g_ttu_spacing_tl } { double }
+      { \doublespacing } { \onehalfspacing }
+    \dim_set:Nn \l_tmpa_dim { \baselineskip }
+    \setstretch { 1.0 }
+    \setlength { \bibitemsep }
+      { \dim_eval:n { \l_tmpa_dim - \baselineskip } }
+  }
+\cs_new_eq:NN \ttu@bibliographyspacing \ttu_bibliography_spacing:
+
 %% Committee list, one member per line, for the title page.
 \cs_new_protected:Npn \ttu_committee_lines:
   { \clist_use:Nn \g_ttu_committee_clist { \\ } }
@@ -748,8 +759,8 @@
 
 %% ---------------------------------------------------------------------------
 %% 11. BIBLIOGRAPHY  (manual p.25) -- biblatex/biber, IEEE numeric.
-%%     Single-spaced within an entry, a blank line between entries, and no
-%%     entry split across a page break.
+%%     Single-spaced within an entry, configured document spacing between
+%%     entries, and no entry split across a page break.
 %% ---------------------------------------------------------------------------
 %% ---------------------------------------------------------------------------
 %% WHICH FIELDS PRINT IN THE REFERENCES.  Each line below is one on/off
@@ -766,8 +777,7 @@
 %% only -- see references.bib for why "note" is left alone on purpose.
 \AtEveryBibitem{\clearfield{issn}\clearfield{url}\clearfield{urldate}}
 %% ---------------------------------------------------------------------------
-\renewcommand*{\bibfont}{\normalfont\normalsize\setstretch{1.0}}
-\setlength{\bibitemsep}{\baselineskip}
+\renewcommand*{\bibfont}{\normalfont\normalsize\ttu@bibliographyspacing}
 \AtBeginBibliography{\interlinepenalty=10000\relax}
 
 %% \ThesisSetup{journal-abbreviations = true} calls this.  A biber source map
